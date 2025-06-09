@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "user": "jose",
+    "password": "$2b$10$Lf8Liynq/7uYHO1qcNeCqO6X8k6D5Xols4i4IXr3xSrK0gRjkilvi",
+    "email": "josecoronel20@outlook.com",
+    "createdAt": "2025-06-07T14:58:08.900Z",
+    "nickname": "josemaaaaaaaa",
+    "purchases": [
+      {
+        "id": "1749308316067",
+        "date": "2025-06-07T14:58:36.067Z",
+        "products": [
+          {
+            "id": 2,
+            "title": "Microsoft Xbox X/S Wireless Controller Robot White",
+            "price": 57,
+            "quantity": 1
+          },
+          {
+            "id": 3,
+            "title": "Logitech G733 Lightspeed Wireless Gaming Headset with Suspension Headband, LIGHTSYNC RGB, Blue VO!CE mic Technology and PRO-G Audio Drivers - White",
+            "price": 384,
+            "quantity": 1
+          },
+          {
+            "id": 4,
+            "title": "Sony WH-1000XM5 Wireless Industry Leading Active Noise Cancelling Headphones, 8 Mics for Clear Calling, 30Hr Battery, 3 Min Quick Charge = 3 Hours Playback, Multi Point Connectivity, Alexa-Silver",
+            "price": 362,
+            "quantity": 1
+          },
+          {
+            "id": 5,
+            "title": "Urbanista Los Angeles Sand Gold - World’s 1st Solar Powered Hybrid Active Noise Cancelling with Mic Premium Wireless Headphones, Unlimited Playtime",
+            "price": 265,
+            "quantity": 1
+          }
+        ],
+        "total": 1068
+      }
+    ]
+  }
+]
