@@ -129,15 +129,40 @@ const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
+    // Determinar el dominio basado en el origen de la petición
+    const origin = req.headers.origin;
+    let cookieDomain = 'localhost';
+    
+    if (origin) {
+      try {
+        const url = new URL(origin);
+        cookieDomain = url.hostname;
+      } catch (error) {
+        console.error('Error al parsear el origen:', error);
+        return res.status(500).json({ 
+          message: "Error al configurar la cookie",
+          error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+      }
+    }
+
     // Enviar token en cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 3600000,
-      path: '/',
-      domain: 'localhost'
-    });
+    try {
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 3600000,
+        path: '/',
+        domain: cookieDomain
+      });
+    } catch (cookieError) {
+      console.error('Error al establecer la cookie:', cookieError);
+      return res.status(500).json({ 
+        message: "Error al establecer la sesión",
+        error: process.env.NODE_ENV === 'development' ? cookieError.message : undefined
+      });
+    }
 
     res.json({
       message: "Login exitoso",
@@ -146,7 +171,10 @@ const login = async (req, res) => {
 
   } catch (error) {
     console.error('Error en el login:', error);
-    res.status(500).json({ message: "Error en el login" });
+    res.status(500).json({ 
+      message: "Error en el login",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 

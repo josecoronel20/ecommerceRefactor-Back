@@ -89,7 +89,7 @@ const getMe = async (req, res) => {
 
     if (!token) {
       return res.status(401).json({ message: "El usuario no está logueado" });
-    }
+    }//
 
     try {
       const decoded = jwt.verify(token, "secret_key");
