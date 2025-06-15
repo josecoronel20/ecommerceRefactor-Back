@@ -129,32 +129,14 @@ const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    // Determinar el dominio basado en el origen de la petición
-    const origin = req.headers.origin;
-    let cookieDomain = 'localhost';
-    
-    if (origin) {
-      try {
-        const url = new URL(origin);
-        cookieDomain = url.hostname;
-      } catch (error) {
-        console.error('Error al parsear el origen:', error);
-        return res.status(500).json({ 
-          message: "Error al configurar la cookie",
-          error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-      }
-    }
-
     // Enviar token en cookie
     try {
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
         maxAge: 3600000,
         path: '/',
-        domain: cookieDomain
       });
     } catch (cookieError) {
       console.error('Error al establecer la cookie:', cookieError);
