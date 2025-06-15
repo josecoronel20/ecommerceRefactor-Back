@@ -8,7 +8,7 @@ const app = express();
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    
+
     // Patrones de URL permitidos
     const allowedPatterns = [
       /^https:\/\/ecommerce-refactor-tzah\.vercel\.app$/, // producción
@@ -17,8 +17,8 @@ const corsOptions = {
     ];
 
     // Verificar si el origen coincide con algún patrón
-    const isAllowed = allowedPatterns.some(pattern => pattern.test(origin));
-    
+    const isAllowed = allowedPatterns.some((pattern) => pattern.test(origin));
+
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -27,7 +27,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "credentials"],
 };
 
 app.use(cors(corsOptions));
