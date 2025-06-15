@@ -14,30 +14,48 @@ const deleteUser = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
-    // Nueva forma de eliminar usuario
-    const userFounded = await prisma.user.delete({
-      where: { id: idNumber }
+    // Verificar si el usuario existe antes de eliminarlo
+    const userExists = await prisma.user.findUnique({
+      where: { id: idNumber },
     });
 
-    if (!userFounded) {
+    if (!userExists) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-     res.status(200).json({ message: "Usuario eliminado correctamente" });
-
-    res.clearCookie('token', {
-      httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
-        maxAge: 0,
-        path: '/',
+    // Eliminar usuario
+    await prisma.user.delete({
+      where: { id: idNumber },
     });
 
-    console.log(res)
+    // Limpiar la cookie después de eliminar el usuario
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      maxAge: 0,
+      path: "/",
+    });
+
+    // Enviar respuesta exitosa
+    return res.status(200).json({
+      message: "Usuario eliminado correctamente",
+      success: true,
+    });
   } catch (error) {
     console.error("Error al eliminar usuario:", error);
-    res.status(500).json({
+
+    // Manejo específico de errores de Prisma
+    if (error.code === "P2025") {
+      return res.status(404).json({
+        message: "Usuario no encontrado",
+        success: false,
+      });
+    }
+
+    return res.status(500).json({
       message: "Error al eliminar el usuario",
+      success: false,
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
@@ -58,22 +76,24 @@ const updateUser = async (req, res) => {
       data: {
         ...userData,
         // Solo creamos nuevas compras si se proporcionan
-        ...(purchases && purchases.length > 0 ? {
-          purchases: {
-            create: purchases.map(purchase => {
-              const { id: purchaseId, userId, ...purchaseData } = purchase;
-              return purchaseData;
-            })
-          }
-        } : {})
+        ...(purchases && purchases.length > 0
+          ? {
+              purchases: {
+                create: purchases.map((purchase) => {
+                  const { id: purchaseId, userId, ...purchaseData } = purchase;
+                  return purchaseData;
+                }),
+              },
+            }
+          : {}),
       },
       include: {
         purchases: {
           orderBy: {
-            date: 'desc'
-          }
-        }
-      }
+            date: "desc",
+          },
+        },
+      },
     });
 
     res.status(200).json({
@@ -84,7 +104,7 @@ const updateUser = async (req, res) => {
     console.error("Error detallado al actualizar usuario:", {
       message: error.message,
       code: error.code,
-      meta: error.meta
+      meta: error.meta,
     });
     res.status(500).json({
       message: "Error al actualizar el usuario",
@@ -99,7 +119,7 @@ const getMe = async (req, res) => {
 
     if (!token) {
       return res.status(401).json({ message: "El usuario no está logueado" });
-    }//
+    } //
 
     try {
       const decoded = jwt.verify(token, "secret_key");
@@ -107,7 +127,7 @@ const getMe = async (req, res) => {
 
       const user = await prisma.user.findUnique({
         where: {
-          id: idFromToken
+          id: idFromToken,
         },
         select: {
           id: true,
@@ -119,10 +139,10 @@ const getMe = async (req, res) => {
               id: true,
               date: true,
               total: true,
-              products: true
-            }
-          }
-        }
+              products: true,
+            },
+          },
+        },
       });
 
       if (!user) {
@@ -136,9 +156,9 @@ const getMe = async (req, res) => {
     }
   } catch (error) {
     console.error("Error completo en getMe:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Error al obtener el usuario",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
