@@ -23,7 +23,17 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    res.status(200).json({ message: "Usuario eliminado correctamente" });
+     res.status(200).json({ message: "Usuario eliminado correctamente" });
+
+    res.clearCookie('token', {
+      httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        maxAge: 0,
+        path: '/',
+    });
+
+    console.log(res)
   } catch (error) {
     console.error("Error al eliminar usuario:", error);
     res.status(500).json({
