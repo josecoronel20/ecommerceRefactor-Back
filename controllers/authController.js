@@ -164,10 +164,10 @@ const logout = async (req, res) => {
   try {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true en producción, false en desarrollo
-      sameSite: 'lax',
-      path: '/',
-      domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : 'localhost'
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        maxAge: 0,
+        path: '/',
     });
 
     res.status(200).json({ 
