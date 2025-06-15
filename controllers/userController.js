@@ -7,7 +7,9 @@ const prisma = new PrismaClient();
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id);
     const idNumber = parseInt(id);
+    console.log(idNumber);
 
     const { error } = deleteUserSchema.safeParse({ id: idNumber });
     if (error) {
@@ -22,6 +24,11 @@ const deleteUser = async (req, res) => {
     if (!userExists) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
+    
+    // Eliminar las compras del usuario
+    await prisma.purchase.deleteMany({
+      where: { userId: idNumber },
+    });
 
     // Eliminar usuario
     await prisma.user.delete({
@@ -43,7 +50,7 @@ const deleteUser = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.error("Error al eliminar usuario:", error);
+    console.error("Error al eliminar usuario:", error.message);
 
     // Manejo específico de errores de Prisma
     if (error.code === "P2025") {
