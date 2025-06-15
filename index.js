@@ -4,29 +4,33 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-// Permitir origenes autorizados
-const allowedOrigins = [
-  "https://ecommerce-refactor-tzah.vercel.app", // producción
-  "https://ecommerce-refactor-tzah-ipamhyvn7-josecoronel20s-projects.vercel.app", // preview
-  "http://localhost:3000", // desarrollo local
-];
+// Configuración de CORS
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    
+    // Patrones de URL permitidos
+    const allowedPatterns = [
+      /^https:\/\/ecommerce-refactor-tzah\.vercel\.app$/, // producción
+      /^https:\/\/ecommerce-refactor-tzah-.*\.vercel\.app$/, // previews
+      /^http:\/\/localhost:3000$/, // desarrollo local
+    ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("No permitido por CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+    // Verificar si el origen coincide con algún patrón
+    const isAllowed = allowedPatterns.some(pattern => pattern.test(origin));
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error("No permitido por CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
