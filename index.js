@@ -1,37 +1,41 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
-//routes
-const productsRoutes = require("./routes/products");
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
+const app = express();
+
+// Permitir origenes autorizados
+const allowedOrigins = [
+  "https://ecommerce-refactor-tzah.vercel.app", // producción
+  "https://ecommerce-refactor-tzah-ipamhyvn7-josecoronel20s-projects.vercel.app", // preview
+  "http://localhost:3000", // desarrollo local
+];
 
 app.use(
   cors({
-    origin: ["https://ecommerce-refactor-tzah.vercel.app", "http://localhost:3000"],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); 
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("No permitido por CORS"));
+      }
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['set-cookie']
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
 
-// productos
-app.use("/api/products", productsRoutes);
+// Rutas
+app.use("/api/products", require("./routes/products"));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/user", require("./routes/user"));
 
-// auth
-app.use("/api/auth", authRoutes);
-
-// user
-app.use("/api/user", userRoutes);
-
-// Iniciar servidor
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
